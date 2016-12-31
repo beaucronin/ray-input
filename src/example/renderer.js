@@ -28,7 +28,7 @@ const ACTIVE_COLOR = new THREE.Color(0xFF3333);
  */
 export default class MenuRenderer {
 
-  constructor() {
+  constructor(vrDisplay) {
     var scene = new THREE.Scene();
 
     var aspect = window.innerWidth / window.innerHeight;
@@ -46,7 +46,7 @@ export default class MenuRenderer {
     document.body.appendChild(renderer.domElement);
 
     // Input manager.
-    var rayInput = new RayInput(camera)
+    var rayInput = new RayInput(camera, null, vrDisplay)
     rayInput.setSize(renderer.getSize());
     rayInput.on('raydown', (opt_mesh) => { this.handleRayDown_(opt_mesh) });
     rayInput.on('rayup', (opt_mesh) => { this.handleRayUp_(opt_mesh) });

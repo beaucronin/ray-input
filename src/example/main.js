@@ -19,13 +19,14 @@ let renderer;
 let vrDisplay;
 
 function onLoad() {
-  renderer = new MenuRenderer();
-
-  window.addEventListener('resize', () => { renderer.resize() });
 
   navigator.getVRDisplays().then(function(displays) {
     if (displays.length > 0) {
       vrDisplay = displays[0];
+      
+      renderer = new MenuRenderer(vrDisplay);
+
+      window.addEventListener('resize', () => { renderer.resize() });
       vrDisplay.requestAnimationFrame(render);
     }
   });

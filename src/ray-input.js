@@ -23,12 +23,13 @@ import InteractionModes from './ray-interaction-modes'
  * API wrapper for the input library.
  */
 export default class RayInput extends EventEmitter {
-  constructor(camera, opt_el) {
+  constructor(camera, opt_el, vrDisplay) {
     super();
 
     this.camera = camera;
     this.renderer = new RayRenderer(camera);
     this.controller = new RayController(opt_el);
+    this.vrDisplay = vrDisplay;
 
     // Arm model needed to transform controller orientation into proper pose.
     this.armModel = new OrientationArmModel();
@@ -149,11 +150,30 @@ export default class RayInput extends EventEmitter {
           console.warn('Invalid gamepad pose. Can\'t update ray.');
           break;
         }
+
         let orientation = new THREE.Quaternion().fromArray(pose.orientation);
         let position = new THREE.Vector3().fromArray(pose.position);
 
-        this.renderer.setOrientation(orientation);
-        this.renderer.setPosition(position);
+        if (this.vrDisplay && this.vrDisplay.stageParameters) {
+          let composed = new THREE.Matrix4();
+          let stageParameters = new THREE.Matrix4().fromArray(
+            this.vrDisplay.stageParameters.sittingToStandingTransform);
+          composed.makeRotationFromQuaternion(orientation);
+          composed.setPosition(position);
+          composed.premultiply(stageParameters);
+
+          let standingOrientation = new THREE.Quaternion();
+          let standingPosition = new THREE.Vector3();
+          let standingScale = new THREE.Vector3();
+          composed.decompose(standingPosition, standingOrientation, standingScale);
+
+          this.renderer.setOrientation(standingOrientation);
+          this.renderer.setPosition(standingPosition);          
+        } else {
+          this.renderer.setOrientation(orientation);
+          this.renderer.setPosition(position);          
+        }
+
 
         // Show ray and reticle.
         this.renderer.setRayVisibility(true);
