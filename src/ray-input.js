@@ -154,8 +154,25 @@ export default class RayInput extends EventEmitter {
         let orientation = new THREE.Quaternion().fromArray(pose.orientation);
         let position = new THREE.Vector3().fromArray(pose.position);
 
-        this.renderer.setOrientation(orientation);
-        this.renderer.setPosition(position);
+        if (this.vrDisplay && this.vrDisplay.stageParameters) {
+          let composed = new THREE.Matrix4();
+          let stageParameters = new THREE.Matrix4().fromArray(
+            this.vrDisplay.stageParameters.sittingToStandingTransform);
+          composed.makeRotationFromQuaternion(orientation);
+          composed.setPosition(position);
+          composed.premultiply(stageParameters);
+
+          let standingOrientation = new THREE.Quaternion();
+          let standingPosition = new THREE.Vector3();
+          let standingScale = new THREE.Vector3();
+          composed.decompose(standingPosition, standingOrientation, standingScale);
+
+          this.renderer.setOrientation(standingOrientation);
+          this.renderer.setPosition(standingPosition);          
+        } else {
+          this.renderer.setOrientation(orientation);
+          this.renderer.setPosition(position);          
+        }
 
         // Show ray and reticle.
         this.renderer.setRayVisibility(true);
