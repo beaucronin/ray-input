@@ -13,6 +13,8 @@
  * limitations under the License.
  */
 
+import * as THREE from 'three'
+
 const HEAD_ELBOW_OFFSET = new THREE.Vector3(0.155, -0.465, -0.15);
 const ELBOW_WRIST_OFFSET = new THREE.Vector3(0, 0, -0.25);
 const WRIST_CONTROLLER_OFFSET = new THREE.Vector3(0, 0, 0.05);

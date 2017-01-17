@@ -13,6 +13,8 @@
  * limitations under the License.
  */
 
+import * as THREE from 'three'
+
 import EventEmitter from 'eventemitter3'
 import InteractionModes from './ray-interaction-modes'
 import {isMobile} from './util'

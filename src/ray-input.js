@@ -13,6 +13,8 @@
  * limitations under the License.
  */
 
+import * as THREE from 'three'
+
 import OrientationArmModel from './orientation-arm-model'
 import EventEmitter from 'eventemitter3'
 import RayRenderer from './ray-renderer'
