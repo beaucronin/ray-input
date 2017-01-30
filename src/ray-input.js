@@ -218,6 +218,7 @@ export default class RayInput extends EventEmitter {
     this.renderer.update();
     let mesh = this.renderer.getSelectedMesh();
     this.emit('raydown', mesh);
+    this.emit('raydown', mesh) // weird hack - otherwise mouse raydown events are always one behind
 
     this.renderer.setActive(true);
   }

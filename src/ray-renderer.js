@@ -107,25 +107,23 @@ export default class RayRenderer extends EventEmitter {
       let isIntersected = (intersects.length > 0);
       let isSelected = this.selected[id];
 
-      // If it's newly selected, send rayover.
-      if (isIntersected && !isSelected) {
-        this.selected[id] = true;
-        if (this.isActive) {
-          this.emit('rayover', mesh);
-        }
-      }
-
-      // If it's no longer intersected, send rayout.
-      if (!isIntersected && isSelected) {
-        delete this.selected[id];
-        this.moveReticle_(null);
-        if (this.isActive) {
-          this.emit('rayout', mesh);
-        }
-      }
-
       if (isIntersected) {
-        this.moveReticle_(intersects);
+        // If it's newly selected, send rayover.
+        if (!isSelected && this.isActive) {
+          this.emit('rayover', mesh)
+        }
+        this.moveReticle_(intersects)
+        this.selected[id] = true
+      } else {
+        if (isSelected) {
+          delete this.selected[id]
+          this.moveReticle_(null)
+          // If it's no longer intersected, send rayout.
+          if (this.isActive) {
+            this.emit('rayout', mesh)
+          }
+        }
+
       }
     }
   }
@@ -180,17 +178,22 @@ export default class RayRenderer extends EventEmitter {
   }
 
   /**
-   * Gets the currently selected object in the scene.
+   * Gets the closest currently selected object in the scene.
    */
   getSelectedMesh() {
-    let count = 0;
     let mesh = null;
+    let meshId = null
+    let meshDistance = Number.POSITIVE_INFINITY
+
     for (var id in this.selected) {
-      count += 1;
-      mesh = this.meshes[id];
-    }
-    if (count > 1) {
-      console.warn('More than one mesh selected.');
+      let v = new THREE.Vector3()
+      v.setFromMatrixPosition(this.meshes[id].matrixWorld)
+      let d = this.camera.position.distanceTo(v)
+      if (d < meshDistance) {
+        mesh = this.meshes[id]
+        meshId = id
+        meshDistance = d
+      }
     }
     return mesh;
   }
